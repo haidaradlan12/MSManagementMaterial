@@ -123,7 +123,7 @@
 
                                         @if($row->stock_qty != $row->actual_qty)
                                             <span class="px-2.5 py-1 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-full inline-block mt-1">
-                                                Opname Lagi
+                                                (Opname Lagi)
                                             </span>
                                         @endif
                                     </td>
