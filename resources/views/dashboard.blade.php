@@ -122,6 +122,75 @@
                 </div>
             </div>
 
+            {{-- ── Overview Material System dan Actual ── --}}
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">Overview Material System dan Actual</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">Qty Sistem dari stok aktual · Qty Aktual & Status dari opname terakhir per lokasi</p>
+                    </div>
+                    <span class="bg-gray-100 text-gray-600 text-xs font-bold px-2.5 py-1 rounded-full">{{ $overviewMaterial->count() }} item</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-600">
+                        <thead class="text-xs text-gray-500 uppercase bg-gray-50">
+                            <tr>
+                                <th class="px-5 py-3">Nama Material</th>
+                                <th class="px-5 py-3">Lokasi Penyimpanan</th>
+                                <th class="px-5 py-3 text-center">System Qty</th>
+                                <th class="px-5 py-3 text-center">Actual Qty</th>
+                                <th class="px-5 py-3 text-center">Status</th>
+                                <th class="px-5 py-3 text-center">Tgl Opname Terakhir</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @forelse($overviewMaterial as $row)
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-5 py-3 font-semibold text-gray-900">{{ $row->material_name }}</td>
+                                    <td class="px-5 py-3 text-gray-600">{{ $row->location }}</td>
+                                    <td class="px-5 py-3 text-center">
+                                        <span class="inline-block px-3 py-1 rounded-full text-xs font-bold
+                                            {{ $row->system_qty > 10 ? 'bg-green-100 text-green-700' : ($row->system_qty > 0 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') }}">
+                                            {{ number_format($row->system_qty) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-5 py-3 text-center">
+                                        @if($row->actual_qty !== null)
+                                            <span class="text-gray-800 font-medium">{{ number_format($row->actual_qty) }}</span>
+                                        @else
+                                            <span class="text-gray-300 text-xs">—</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-5 py-3 text-center">
+                                        @if($row->status === 'matched')
+                                            <span class="px-2.5 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">✓ Matched</span>
+                                        @elseif($row->status === 'surplus')
+                                            <span class="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">↑ Surplus (+{{ $row->difference }})</span>
+                                        @elseif($row->status === 'missing')
+                                            <span class="px-2.5 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full">↓ Missing ({{ $row->difference }})</span>
+                                        @else
+                                            <span class="px-2.5 py-1 bg-orange-100 text-orange-600 text-xs font-medium rounded-full">⚠ Perlu dilakukan stock opname</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-5 py-3 text-center text-xs text-gray-500">
+                                        @if($row->last_opname_at)
+                                            {{ \Carbon\Carbon::parse($row->last_opname_at)->format('d M Y') }}
+                                        @else
+                                            <span class="text-gray-300">—</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="px-5 py-8 text-center text-gray-400 text-sm">Belum ada data stok material.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {{-- ── Latest Stock Opname Activity ── --}}
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <h3 class="text-lg font-bold text-gray-700 mb-4">Latest Stock Opname Activity</h3>

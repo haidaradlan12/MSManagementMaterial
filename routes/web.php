@@ -27,7 +27,33 @@ Route::get('/dashboard', function () {
     $totalPending = InventoryTransaction::where('status', 'pending')->count();
     $latestOpnames = StockOpname::with('material')->latest()->take(5)->get();
 
-    return view('dashboard', compact('totalMaterials', 'totalOpnames', 'totalPending', 'latestOpnames', 'stock'));
+    // Build latest opname keyed by material_name|location
+    $latestOpnameMap = StockOpname::with('material')
+        ->get()
+        ->groupBy(function ($o) {
+            $name = strtolower(trim($o->material?->material_name ?? $o->material_name_manual ?? ''));
+
+            return $name.'|'.strtolower(trim($o->location ?? ''));
+        })
+        ->map(fn ($g) => $g->sortByDesc(fn ($o) => $o->opname_date.'_'.str_pad($o->id, 10, '0', STR_PAD_LEFT))->first());
+
+    // Build overview: each stock row + latest opname data
+    $overviewMaterial = $stock->values()->map(function ($row) use ($latestOpnameMap) {
+        $key = strtolower(trim($row->material_name)).'|'.strtolower(trim($row->location ?? ''));
+        $opname = $latestOpnameMap->get($key);
+
+        return (object) [
+            'material_name' => $row->material_name,
+            'location' => $row->location,
+            'system_qty' => $row->stock_qty,
+            'actual_qty' => $opname?->actual_quantity,
+            'status' => $opname?->status,
+            'difference' => $opname?->difference,
+            'last_opname_at' => $opname?->opname_date,
+        ];
+    })->sortBy('material_name')->values();
+
+    return view('dashboard', compact('totalMaterials', 'totalOpnames', 'totalPending', 'latestOpnames', 'stock', 'overviewMaterial'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
