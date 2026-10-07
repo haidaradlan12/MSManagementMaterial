@@ -78,9 +78,17 @@
                                             <form action="{{ route('transactions.reject', $tx) }}" method="POST">
                                                 @csrf @method('PATCH')
                                                 <button type="submit"
-                                                        class="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition-colors"
+                                                        class="px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-semibold rounded-lg transition-colors"
                                                         onclick="return confirm('Tolak pengajuan ini?')">
                                                     ✗ Tolak
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('transactions.destroy', $tx) }}" method="POST">
+                                                @csrf @method('DELETE')
+                                                <button type="submit"
+                                                        class="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition-colors"
+                                                        onclick="return confirm('Hapus pengajuan ini selamanya?')">
+                                                    🗑 Hapus
                                                 </button>
                                             </form>
                                         </div>

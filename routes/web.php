@@ -37,7 +37,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('stock-opnames', StockOpnameController::class);
 
     // Inventory transactions – admin area
-    Route::resource('transactions', InventoryTransactionController::class)->except(['create', 'store']);
+    Route::resource('transactions', InventoryTransactionController::class)
+        ->except(['create', 'store'])
+        ->parameters(['transactions' => 'inventoryTransaction']);
     Route::patch('transactions/{inventoryTransaction}/approve', [InventoryTransactionController::class, 'approve'])->name('transactions.approve');
     Route::patch('transactions/{inventoryTransaction}/reject', [InventoryTransactionController::class, 'reject'])->name('transactions.reject');
 
