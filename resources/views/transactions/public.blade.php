@@ -103,10 +103,21 @@
                     <!-- Nama Barang – manual only -->
                     <div class="mb-4">
                         <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Barang <span class="text-red-500">*</span></label>
-                        <input type="text" name="material_name_manual" id="receive_material_name"
-                               placeholder="Ketik nama barang yang diterima..."
-                               value="{{ old('material_name_manual') }}" required
-                               class="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+                        <select name="material_name_manual" id="receive_material_name" class="w-full" required placeholder="Ketik nama barang yang diterima...">
+                            <option value="">Ketik nama barang yang diterima...</option>
+                            @php
+                                $oldMaterial = old('material_name_manual');
+                                $materialsList = $materials->pluck('material_name')->toArray();
+                            @endphp
+                            @if($oldMaterial && !in_array($oldMaterial, $materialsList))
+                                <option value="{{ $oldMaterial }}" selected>{{ $oldMaterial }}</option>
+                            @endif
+                            @foreach($materials as $material)
+                                <option value="{{ $material->material_name }}" {{ $oldMaterial == $material->material_name ? 'selected' : '' }}>
+                                    {{ $material->material_name }}
+                                </option>
+                            @endforeach
+                        </select>
                         @error('material_name_manual') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
@@ -278,6 +289,19 @@
             document.getElementById('take_stock_info').classList.remove('hidden');
             document.getElementById('take_qty').setAttribute('max', row.stock_qty);
         }
+
+        /* Initialize Tom Select on receive dropdown */
+        (function () {
+            new TomSelect('#receive_material_name', {
+                create: true,
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                },
+                placeholder: 'Ketik nama barang yang diterima...',
+                maxOptions: 300,
+            });
+        })();
 
         /* Initialize Tom Select on take dropdown */
         (function () {
