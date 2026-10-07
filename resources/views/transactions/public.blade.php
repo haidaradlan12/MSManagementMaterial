@@ -108,7 +108,6 @@
                             @php
                                 $oldMaterial = old('material_name_manual');
                                 $autocompleteNames = collect();
-                                foreach($materials as $m) $autocompleteNames->push($m->material_name);
                                 foreach($stocks as $s) $autocompleteNames->push($s->material_name);
                                 $autocompleteNames = $autocompleteNames->filter()->unique()->sort()->values();
                             @endphp
