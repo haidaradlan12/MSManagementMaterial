@@ -54,7 +54,7 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-gray-800 leading-tight">Portal Barang</h1>
-                    <p class="text-xs text-gray-500">SO Material Management</p>
+                    <p class="text-xs text-gray-500">Material Management MS MTBU</p>
                 </div>
             </div>
             <a href="{{ route('login') }}" class="text-xs text-blue-600 hover:underline font-medium">Login Admin →</a>
