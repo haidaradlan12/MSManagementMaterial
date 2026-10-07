@@ -16,12 +16,6 @@ require __DIR__.'/vendor/autoload.php';
 // Bootstrap Laravel and handle the request...
 /** @var Application $app */
 $app = require_once __DIR__.'/bootstrap/app.php';
-<<<<<<< Updated upstream
-$app->usePublicPath(__DIR__);
-=======
-
 // Beri tahu Laravel bahwa folder public-nya sekarang adalah folder saat ini (root)
 $app->usePublicPath(__DIR__);
-
->>>>>>> Stashed changes
 $app->handleRequest(Request::capture());
