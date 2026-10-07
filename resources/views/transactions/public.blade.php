@@ -107,14 +107,17 @@
                             <option value="">Ketik nama barang yang diterima...</option>
                             @php
                                 $oldMaterial = old('material_name_manual');
-                                $materialsList = $materials->pluck('material_name')->toArray();
+                                $autocompleteNames = collect();
+                                foreach($materials as $m) $autocompleteNames->push($m->material_name);
+                                foreach($stocks as $s) $autocompleteNames->push($s->material_name);
+                                $autocompleteNames = $autocompleteNames->filter()->unique()->sort()->values();
                             @endphp
-                            @if($oldMaterial && !in_array($oldMaterial, $materialsList))
+                            @if($oldMaterial && !$autocompleteNames->contains($oldMaterial))
                                 <option value="{{ $oldMaterial }}" selected>{{ $oldMaterial }}</option>
                             @endif
-                            @foreach($materials as $material)
-                                <option value="{{ $material->material_name }}" {{ $oldMaterial == $material->material_name ? 'selected' : '' }}>
-                                    {{ $material->material_name }}
+                            @foreach($autocompleteNames as $name)
+                                <option value="{{ $name }}" {{ $oldMaterial == $name ? 'selected' : '' }}>
+                                    {{ $name }}
                                 </option>
                             @endforeach
                         </select>
