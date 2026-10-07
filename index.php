@@ -17,4 +17,10 @@ require __DIR__.'/vendor/autoload.php';
 /** @var Application $app */
 $app = require_once __DIR__.'/bootstrap/app.php';
 
+// --- TAMBAHKAN KODE INI SEMENTARA ---
+echo "<b>Lokasi folder saat ini:</b> " . __DIR__ . "<br>";
+echo "<b>Apakah file .env ada?</b> " . (file_exists(__DIR__.'/.env') ? "ADA" : "TIDAK ADA") . "<br>";
+exit;
+// ------------------------------------
+
 $app->handleRequest(Request::capture());
