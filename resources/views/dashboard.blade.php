@@ -139,7 +139,8 @@
                                 <th class="px-5 py-3">Lokasi Penyimpanan</th>
                                 <th class="px-5 py-3 text-center">System Qty</th>
                                 <th class="px-5 py-3 text-center">Actual Qty</th>
-                                <th class="px-5 py-3 text-center">Status</th>
+                                <th class="px-5 py-3 text-center">Status Sebelum</th>
+                                <th class="px-5 py-3 text-center">Status Sekarang</th>
                                 <th class="px-5 py-3 text-center">Tgl Opname Terakhir</th>
                             </tr>
                         </thead>
@@ -170,6 +171,11 @@
                                             <span class="px-2.5 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full">↓ Missing ({{ $row->difference }})</span>
                                         @else
                                             <span class="px-2.5 py-1 bg-orange-100 text-orange-600 text-xs font-medium rounded-full">⚠ Perlu dilakukan stock opname</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-5 py-3 text-center">
+                                        @if($row->actual_qty !== null && $row->system_qty != $row->actual_qty && in_array($row->status, ['matched', 'surplus', 'missing']))
+                                            <span class="px-2.5 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded-full">Jangan lupa opname lagi</span>
                                         @endif
                                     </td>
                                     <td class="px-5 py-3 text-center text-xs text-gray-500">
