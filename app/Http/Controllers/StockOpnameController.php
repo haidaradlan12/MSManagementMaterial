@@ -51,7 +51,7 @@ class StockOpnameController extends Controller
 
                 return $name.'|'.strtolower(trim($o->location ?? ''));
             })
-            ->map(fn ($group) => $group->sortByDesc('opname_date')->first())
+            ->map(fn ($group) => $group->sortByDesc(fn ($o) => $o->opname_date.'_'.str_pad($o->id, 10, '0', STR_PAD_LEFT))->first())
             ->filter(fn ($o) => in_array($o->status, ['surplus', 'missing']));
 
         // Match those pairs back against computed stocks for current qty info
