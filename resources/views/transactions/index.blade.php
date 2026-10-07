@@ -78,7 +78,7 @@
                                             <form action="{{ route('transactions.reject', $tx) }}" method="POST">
                                                 @csrf @method('PATCH')
                                                 <button type="submit"
-                                                        class="px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-semibold rounded-lg transition-colors"
+                                                        class="px-3 py-1.5 bg-gray-500 hover:bg-gray-600 text-white text-xs font-semibold rounded-lg transition-colors"
                                                         onclick="return confirm('Tolak pengajuan ini?')">
                                                     ✗ Tolak
                                                 </button>
