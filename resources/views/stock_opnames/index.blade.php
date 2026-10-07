@@ -71,7 +71,79 @@
                 </div>
             </div>
 
+            {{-- ── Rekomendasi Di-Opname Ulang ── --}}
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-orange-400 animate-pulse"></span>
+                        <h3 class="font-bold text-gray-800">Rekomendasi Di-Opname Ulang</h3>
+                        <span class="text-xs text-gray-400">(opname terakhir surplus / missing)</span>
+                    </div>
+                    <span class="bg-orange-100 text-orange-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                        {{ $recommendedOpname->count() }} item
+                    </span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-600">
+                        <thead class="text-xs text-gray-500 uppercase bg-gray-50">
+                            <tr>
+                                <th class="px-5 py-3">Nama Material</th>
+                                <th class="px-5 py-3">Lokasi Penyimpanan</th>
+                                <th class="px-5 py-3 text-center">Stok Sistem</th>
+                                <th class="px-5 py-3 text-center">Status Terakhir</th>
+                                <th class="px-5 py-3 text-center">Tgl Opname Terakhir</th>
+                                <th class="px-5 py-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @forelse($recommendedOpname as $row)
+                                <tr class="hover:bg-orange-50 transition-colors">
+                                    <td class="px-5 py-3 font-semibold text-gray-900">{{ $row->material_name }}</td>
+                                    <td class="px-5 py-3 text-gray-600">{{ $row->location }}</td>
+                                    <td class="px-5 py-3 text-center">
+                                        <span class="inline-block px-3 py-1 rounded-full text-xs font-bold
+                                            {{ $row->stock_qty > 10 ? 'bg-green-100 text-green-700' : ($row->stock_qty > 0 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') }}">
+                                            {{ number_format($row->stock_qty) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-5 py-3 text-center">
+                                        @if($row->last_status === 'surplus')
+                                            <span class="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                                                ↑ Surplus (+{{ $row->last_diff }})
+                                            </span>
+                                        @else
+                                            <span class="px-2.5 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
+                                                ↓ Missing ({{ $row->last_diff }})
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="px-5 py-3 text-center text-xs text-gray-500">
+                                        {{ \Carbon\Carbon::parse($row->last_opname_at)->format('d M Y') }}
+                                    </td>
+                                    <td class="px-5 py-3 text-center">
+                                        <a href="{{ route('stock-opnames.create') }}"
+                                           class="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold rounded-lg transition-colors inline-block">
+                                            + Opname Ulang
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="px-5 py-8 text-center text-gray-400">
+                                        <svg class="w-10 h-10 mx-auto mb-2 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <p class="text-sm font-medium">Semua opname terakhir sudah sesuai! ✅</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             {{-- ── Opname History ── --}}
+
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 space-y-3">
                     <div class="flex items-center justify-between">

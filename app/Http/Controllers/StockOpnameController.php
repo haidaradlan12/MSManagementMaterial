@@ -41,7 +41,41 @@ class StockOpnameController extends Controller
             })
             ->values();
 
-        return view('stock_opnames.index', compact('stockOpnames', 'notOpnamed'));
+        // Build recommended re-opname: stocks whose LATEST opname result is surplus or missing
+        // Get the latest opname per material_name|location pair
+        $latestOpnamePerPair = StockOpname::query()
+            ->with('material')
+            ->get()
+            ->groupBy(function ($o) {
+                $name = strtolower(trim($o->material?->material_name ?? $o->material_name_manual ?? ''));
+
+                return $name.'|'.strtolower(trim($o->location ?? ''));
+            })
+            ->map(fn ($group) => $group->sortByDesc('opname_date')->first())
+            ->filter(fn ($o) => in_array($o->status, ['surplus', 'missing']));
+
+        // Match those pairs back against computed stocks for current qty info
+        $computedStocksByKey = InventoryTransaction::computedStock()
+            ->values()
+            ->keyBy(function ($row) {
+                return strtolower(trim($row->material_name)).'|'.strtolower(trim($row->location ?? ''));
+            });
+
+        $recommendedOpname = $latestOpnamePerPair->map(function ($opname, $key) use ($computedStocksByKey) {
+            $stock = $computedStocksByKey->get($key);
+
+            return (object) [
+                'material_name' => $opname->material?->material_name ?? $opname->material_name_manual ?? '—',
+                'location' => $opname->location ?? '-',
+                'stock_qty' => $stock?->stock_qty ?? 0,
+                'last_status' => $opname->status,
+                'last_diff' => $opname->difference,
+                'last_opname_at' => $opname->opname_date,
+            ];
+        })->values();
+
+        return view('stock_opnames.index', compact('stockOpnames', 'notOpnamed', 'recommendedOpname'));
+
     }
 
     public function create()
