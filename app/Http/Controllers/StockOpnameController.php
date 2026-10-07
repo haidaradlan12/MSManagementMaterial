@@ -13,7 +13,29 @@ class StockOpnameController extends Controller
     {
         $stockOpnames = StockOpname::with('material', 'user')->latest()->paginate(10);
 
-        return view('stock_opnames.index', compact('stockOpnames'));
+        // Build a set of "material_name|location" pairs that have ever been opnamed
+        $opnamedPairs = StockOpname::query()
+            ->get(['material_name_manual', 'material_id', 'location'])
+            ->map(function ($o) {
+                $name = $o->material?->material_name ?? $o->material_name_manual ?? '';
+
+                return strtolower(trim($name)).'|'.strtolower(trim($o->location ?? ''));
+            })
+            ->filter()
+            ->unique()
+            ->flip(); // flip so we can use isset() for O(1) lookup
+
+        // Filter computed stocks to those whose pair has never been opnamed
+        $notOpnamed = InventoryTransaction::computedStock()
+            ->values()
+            ->filter(function ($row) use ($opnamedPairs) {
+                $key = strtolower(trim($row->material_name)).'|'.strtolower(trim($row->location ?? ''));
+
+                return ! isset($opnamedPairs[$key]);
+            })
+            ->values();
+
+        return view('stock_opnames.index', compact('stockOpnames', 'notOpnamed'));
     }
 
     public function create()

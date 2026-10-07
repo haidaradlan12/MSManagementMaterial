@@ -6,68 +6,129 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-bold text-gray-700">Opname History</h3>
-                        <a href="{{ route('stock-opnames.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Record Opname
-                        </a>
-                    </div>
-                    
-                    @if (session('success'))
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-                            <span class="block sm:inline">{{ session('success') }}</span>
-                        </div>
-                    @endif
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left text-gray-500">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                                <tr>
-                                    <th class="px-4 py-3">Date</th>
-                                    <th class="px-4 py-3">Material</th>
-                                    <th class="px-4 py-3">System</th>
-                                    <th class="px-4 py-3">Actual</th>
-                                    <th class="px-4 py-3">Status</th>
-                                    <th class="px-4 py-3 text-right">Actions</th>
+            @if (session('success'))
+                <div class="flex items-center gap-3 bg-green-50 border border-green-200 text-green-800 rounded-xl px-4 py-3">
+                    <svg class="w-5 h-5 text-green-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-sm font-medium">{{ session('success') }}</span>
+                </div>
+            @endif
+
+            {{-- ── Belum Di-Opname ── --}}
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-red-400 animate-pulse"></span>
+                        <h3 class="font-bold text-gray-800">Belum Di-Opname</h3>
+                    </div>
+                    <span class="bg-red-100 text-red-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                        {{ $notOpnamed->count() }} item
+                    </span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-600">
+                        <thead class="text-xs text-gray-500 uppercase bg-gray-50">
+                            <tr>
+                                <th class="px-5 py-3">Nama Material</th>
+                                <th class="px-5 py-3">Lokasi Penyimpanan</th>
+                                <th class="px-5 py-3 text-center">Stok Sistem</th>
+                                <th class="px-5 py-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @forelse($notOpnamed as $row)
+                                <tr class="hover:bg-red-50 transition-colors">
+                                    <td class="px-5 py-3 font-semibold text-gray-900">{{ $row->material_name }}</td>
+                                    <td class="px-5 py-3 text-gray-600">{{ $row->location }}</td>
+                                    <td class="px-5 py-3 text-center">
+                                        <span class="inline-block px-3 py-1 rounded-full text-xs font-bold
+                                            {{ $row->stock_qty > 10 ? 'bg-green-100 text-green-700' : ($row->stock_qty > 0 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') }}">
+                                            {{ number_format($row->stock_qty) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-5 py-3 text-center">
+                                        <a href="{{ route('stock-opnames.create') }}"
+                                           class="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg transition-colors inline-block">
+                                            + Opname Sekarang
+                                        </a>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($stockOpnames as $opname)
-                                    <tr class="border-b">
-                                        <td class="px-4 py-3">{{ $opname->opname_date }}</td>
-                                        <td class="px-4 py-3 font-medium text-gray-900">{{ $opname->material_label }}</td>
-                                        <td class="px-4 py-3">{{ $opname->system_quantity }}</td>
-                                        <td class="px-4 py-3">{{ $opname->actual_quantity }}</td>
-                                        <td class="px-4 py-3">
-                                            @if($opname->status == 'matched')
-                                                <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Matched</span>
-                                            @elseif($opname->status == 'surplus')
-                                                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">Surplus (+{{ $opname->difference }})</span>
-                                            @else
-                                                <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">Missing ({{ $opname->difference }})</span>
-                                            @endif
-                                        </td>
-                                        <td class="px-4 py-3 text-right">
-                                            <a href="{{ route('stock-opnames.edit', $opname) }}" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
-                                            <form action="{{ route('stock-opnames.destroy', $opname) }}" method="POST" class="inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure?')">Delete</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="mt-4">
-                        {{ $stockOpnames->links() }}
-                    </div>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="px-5 py-8 text-center text-gray-400">
+                                        <svg class="w-10 h-10 mx-auto mb-2 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <p class="text-sm font-medium">Semua item sudah pernah di-opname! 🎉</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
+
+            {{-- ── Opname History ── --}}
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <h3 class="font-bold text-gray-800">Opname History</h3>
+                    <a href="{{ route('stock-opnames.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-lg transition-colors">
+                        + Record Opname
+                    </a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-600">
+                        <thead class="text-xs text-gray-500 uppercase bg-gray-50">
+                            <tr>
+                                <th class="px-5 py-3">Tanggal</th>
+                                <th class="px-5 py-3">Material</th>
+                                <th class="px-5 py-3">Lokasi</th>
+                                <th class="px-5 py-3 text-center">Sistem</th>
+                                <th class="px-5 py-3 text-center">Aktual</th>
+                                <th class="px-5 py-3 text-center">Status</th>
+                                <th class="px-5 py-3 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @foreach($stockOpnames as $opname)
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-5 py-3 whitespace-nowrap">
+                                        <div class="text-xs text-gray-700 font-medium">{{ \Carbon\Carbon::parse($opname->opname_date)->format('d M Y') }}</div>
+                                    </td>
+                                    <td class="px-5 py-3 font-medium text-gray-900">{{ $opname->material_label }}</td>
+                                    <td class="px-5 py-3 text-gray-600">{{ $opname->location ?? '—' }}</td>
+                                    <td class="px-5 py-3 text-center">{{ $opname->system_quantity }}</td>
+                                    <td class="px-5 py-3 text-center">{{ $opname->actual_quantity }}</td>
+                                    <td class="px-5 py-3 text-center">
+                                        @if($opname->status == 'matched')
+                                            <span class="px-2.5 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">✓ Matched</span>
+                                        @elseif($opname->status == 'surplus')
+                                            <span class="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">↑ Surplus (+{{ $opname->difference }})</span>
+                                        @else
+                                            <span class="px-2.5 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full">↓ Missing ({{ $opname->difference }})</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-5 py-3 text-right">
+                                        <a href="{{ route('stock-opnames.edit', $opname) }}" class="text-blue-600 hover:text-blue-900 text-xs font-medium mr-3">Edit</a>
+                                        <form action="{{ route('stock-opnames.destroy', $opname) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-500 hover:text-red-700 text-xs font-medium" onclick="return confirm('Hapus data opname ini?')">Hapus</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="px-5 py-4 border-t border-gray-100">
+                    {{ $stockOpnames->links() }}
+                </div>
+            </div>
+
         </div>
     </div>
 </x-app-layout>
