@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard Material Management MTBU') }}
+            {{ __('Dashboard Material Management MS MTBU') }}
         </h2>
     </x-slot>
 
