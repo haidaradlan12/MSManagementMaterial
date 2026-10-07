@@ -4,6 +4,8 @@ use App\Http\Controllers\InventoryTransactionController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StockOpnameController;
+use App\Http\Controllers\UserController;
+use App\Http\Middleware\IsAdmin;
 use App\Models\InventoryTransaction;
 use App\Models\StockOpname;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +37,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('materials', MaterialController::class);
     Route::resource('stock-opnames', StockOpnameController::class);
+    Route::get('stock-opnames-export', [StockOpnameController::class, 'export'])->name('stock-opnames.export');
 
     // Inventory transactions – admin area
     Route::resource('transactions', InventoryTransactionController::class)
@@ -44,13 +47,13 @@ Route::middleware('auth')->group(function () {
     Route::patch('transactions/{inventoryTransaction}/reject', [InventoryTransactionController::class, 'reject'])->name('transactions.reject');
 
     // User management - only for admin
-    Route::middleware([\App\Http\Middleware\IsAdmin::class])->group(function () {
-        Route::get('users', [App\Http\Controllers\UserController::class, 'index'])->name('users.index');
-        Route::patch('users/{user}/approve', [App\Http\Controllers\UserController::class, 'approve'])->name('users.approve');
-        Route::patch('users/{user}/reject', [App\Http\Controllers\UserController::class, 'reject'])->name('users.reject');
-        Route::patch('users/{user}/make-admin', [App\Http\Controllers\UserController::class, 'makeAdmin'])->name('users.make-admin');
-        Route::patch('users/{user}/remove-admin', [App\Http\Controllers\UserController::class, 'removeAdmin'])->name('users.remove-admin');
-        Route::delete('users/{user}', [App\Http\Controllers\UserController::class, 'destroy'])->name('users.destroy');
+    Route::middleware([IsAdmin::class])->group(function () {
+        Route::get('users', [UserController::class, 'index'])->name('users.index');
+        Route::patch('users/{user}/approve', [UserController::class, 'approve'])->name('users.approve');
+        Route::patch('users/{user}/reject', [UserController::class, 'reject'])->name('users.reject');
+        Route::patch('users/{user}/make-admin', [UserController::class, 'makeAdmin'])->name('users.make-admin');
+        Route::patch('users/{user}/remove-admin', [UserController::class, 'removeAdmin'])->name('users.remove-admin');
+        Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     });
 });
 

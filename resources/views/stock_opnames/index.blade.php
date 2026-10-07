@@ -73,12 +73,51 @@
 
             {{-- ── Opname History ── --}}
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                    <h3 class="font-bold text-gray-800">Opname History</h3>
-                    <a href="{{ route('stock-opnames.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-lg transition-colors">
-                        + Record Opname
-                    </a>
+                <div class="px-6 py-4 border-b border-gray-100 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-gray-800">Opname History</h3>
+                        <a href="{{ route('stock-opnames.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-lg transition-colors">
+                            + Record Opname
+                        </a>
+                    </div>
+                    {{-- Export form --}}
+                    <form action="{{ route('stock-opnames.export') }}" method="GET"
+                          class="flex flex-col sm:flex-row items-end gap-3 bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+                        <div class="flex flex-col gap-1 w-full sm:w-auto">
+                            <label class="text-xs font-semibold text-gray-600">Dari Tanggal</label>
+                            <input type="date" name="date_from"
+                                   value="{{ request('date_from', now()->startOfMonth()->toDateString()) }}"
+                                   class="rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:ring-2 focus:ring-green-400 outline-none">
+                        </div>
+                        <div class="flex flex-col gap-1 w-full sm:w-auto">
+                            <label class="text-xs font-semibold text-gray-600">Sampai Tanggal</label>
+                            <input type="date" name="date_to"
+                                   value="{{ request('date_to', now()->toDateString()) }}"
+                                   class="rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:ring-2 focus:ring-green-400 outline-none">
+                        </div>
+                        <button type="submit"
+                                class="flex items-center gap-2 px-4 py-1.5 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                            Export Excel
+                        </button>
+                        {{-- Shortcut buttons --}}
+                        <div class="flex gap-2 flex-wrap">
+                            @php
+                                $months = collect(range(0, 5))->map(fn($i) => now()->subMonths($i));
+                            @endphp
+                            @foreach($months as $m)
+                                <a href="{{ route('stock-opnames.export', ['date_from' => $m->copy()->startOfMonth()->toDateString(), 'date_to' => $m->copy()->endOfMonth()->toDateString()]) }}"
+                                   class="px-2.5 py-1.5 bg-white border border-gray-200 hover:border-green-400 text-gray-600 hover:text-green-700 text-xs font-medium rounded-lg transition-colors whitespace-nowrap">
+                                    {{ $m->translatedFormat('M Y') }}
+                                </a>
+                            @endforeach
+                        </div>
+                    </form>
                 </div>
+
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-600">
                         <thead class="text-xs text-gray-500 uppercase bg-gray-50">
