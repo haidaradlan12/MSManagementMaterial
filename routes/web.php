@@ -37,7 +37,6 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('materials', MaterialController::class);
     Route::resource('stock-opnames', StockOpnameController::class);
-    Route::get('stock-opnames-export', [StockOpnameController::class, 'export'])->name('stock-opnames.export');
 
     // Inventory transactions – admin area
     Route::resource('transactions', InventoryTransactionController::class)

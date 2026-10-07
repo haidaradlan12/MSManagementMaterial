@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\StockOpnameExport;
 use App\Http\Requests\StoreStockOpnameRequest;
 use App\Http\Requests\UpdateStockOpnameRequest;
 use App\Models\InventoryTransaction;
 use App\Models\StockOpname;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
 
 class StockOpnameController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $stockOpnames = StockOpname::with('material', 'user')->latest()->paginate(10);
+        $stockOpnames = StockOpname::with('material', 'user')
+            ->when($request->filled('date_from'), fn ($q) => $q->whereDate('opname_date', '>=', $request->date_from))
+            ->when($request->filled('date_to'), fn ($q) => $q->whereDate('opname_date', '<=', $request->date_to))
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
 
         // Build a set of "material_name|location" pairs that have ever been opnamed
         $opnamedPairs = StockOpname::query()
@@ -96,20 +98,5 @@ class StockOpnameController extends Controller
         $stockOpname->delete();
 
         return redirect()->route('stock-opnames.index')->with('success', 'Stock Opname berhasil dihapus.');
-    }
-
-    /** Export stock opname history to Excel by date range. */
-    public function export(Request $request)
-    {
-        $request->validate([
-            'date_from' => ['required', 'date'],
-            'date_to' => ['required', 'date', 'after_or_equal:date_from'],
-        ]);
-
-        $from = Carbon::parse($request->date_from)->startOfDay()->toDateString();
-        $to = Carbon::parse($request->date_to)->endOfDay()->toDateString();
-        $filename = 'Stock_Opname_'.$from.'_sd_'.$to.'.xlsx';
-
-        return Excel::download(new StockOpnameExport($from, $to), $filename);
     }
 }

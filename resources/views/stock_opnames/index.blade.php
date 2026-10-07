@@ -80,43 +80,37 @@
                             + Record Opname
                         </a>
                     </div>
-                    {{-- Export form --}}
-                    <form action="{{ route('stock-opnames.export') }}" method="GET"
-                          class="flex flex-col sm:flex-row items-end gap-3 bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+                    {{-- Filter tanggal --}}
+                    <form action="{{ route('stock-opnames.index') }}" method="GET"
+                          class="flex flex-col sm:flex-row items-end gap-3 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3">
                         <div class="flex flex-col gap-1 w-full sm:w-auto">
                             <label class="text-xs font-semibold text-gray-600">Dari Tanggal</label>
                             <input type="date" name="date_from"
-                                   value="{{ request('date_from', now()->startOfMonth()->toDateString()) }}"
-                                   class="rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:ring-2 focus:ring-green-400 outline-none">
+                                   value="{{ request('date_from') }}"
+                                   class="rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
                         </div>
                         <div class="flex flex-col gap-1 w-full sm:w-auto">
                             <label class="text-xs font-semibold text-gray-600">Sampai Tanggal</label>
                             <input type="date" name="date_to"
-                                   value="{{ request('date_to', now()->toDateString()) }}"
-                                   class="rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:ring-2 focus:ring-green-400 outline-none">
+                                   value="{{ request('date_to') }}"
+                                   class="rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
                         </div>
                         <button type="submit"
-                                class="flex items-center gap-2 px-4 py-1.5 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
+                                class="flex items-center gap-2 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z"/>
                             </svg>
-                            Export Excel
+                            Filter
                         </button>
-                        {{-- Shortcut buttons --}}
-                        <div class="flex gap-2 flex-wrap">
-                            @php
-                                $months = collect(range(0, 5))->map(fn($i) => now()->subMonths($i));
-                            @endphp
-                            @foreach($months as $m)
-                                <a href="{{ route('stock-opnames.export', ['date_from' => $m->copy()->startOfMonth()->toDateString(), 'date_to' => $m->copy()->endOfMonth()->toDateString()]) }}"
-                                   class="px-2.5 py-1.5 bg-white border border-gray-200 hover:border-green-400 text-gray-600 hover:text-green-700 text-xs font-medium rounded-lg transition-colors whitespace-nowrap">
-                                    {{ $m->translatedFormat('M Y') }}
-                                </a>
-                            @endforeach
-                        </div>
+                        @if(request()->hasAny(['date_from', 'date_to']))
+                            <a href="{{ route('stock-opnames.index') }}"
+                               class="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-medium rounded-lg transition-colors whitespace-nowrap">
+                                Reset
+                            </a>
+                        @endif
                     </form>
                 </div>
+
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-600">
