@@ -179,7 +179,7 @@
                             Nama Barang &amp; Lokasi
                         </label>
                         <select id="take_stock_select" class="take-select w-full">
-                            <option value="">— Cari barang yang tersedia —</option>
+                            <option value="">Item Barang : </option>
                             @foreach($stocks as $i => $s)
                                 <option value="{{ $i }}"
                                         data-material-id="{{ $s->material_id }}"
