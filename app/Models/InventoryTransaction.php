@@ -61,7 +61,9 @@ class InventoryTransaction extends Model
             ->groupBy(
                 'inventory_transactions.material_id',
                 'inventory_transactions.material_name_manual',
-                'inventory_transactions.location'
+                'inventory_transactions.location',
+                'materials.material_name',
+                'materials.material_code'
             )
             ->select([
                 'inventory_transactions.material_id',
