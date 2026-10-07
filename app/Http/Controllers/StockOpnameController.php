@@ -42,7 +42,7 @@ class StockOpnameController extends Controller
             ->values();
 
         // Build recommended re-opname: stocks whose LATEST opname result is surplus or missing
-        // Get the latest opname per material_name|location pair
+        // OR where current system stock != latest actual stock
         $latestOpnamePerPair = StockOpname::query()
             ->with('material')
             ->get()
@@ -51,8 +51,7 @@ class StockOpnameController extends Controller
 
                 return $name.'|'.strtolower(trim($o->location ?? ''));
             })
-            ->map(fn ($group) => $group->sortByDesc(fn ($o) => $o->opname_date.'_'.str_pad($o->id, 10, '0', STR_PAD_LEFT))->first())
-            ->filter(fn ($o) => in_array($o->status, ['surplus', 'missing']));
+            ->map(fn ($group) => $group->sortByDesc(fn ($o) => $o->opname_date.'_'.str_pad($o->id, 10, '0', STR_PAD_LEFT))->first());
 
         // Match those pairs back against computed stocks for current qty info
         $computedStocksByKey = InventoryTransaction::computedStock()
@@ -63,15 +62,19 @@ class StockOpnameController extends Controller
 
         $recommendedOpname = $latestOpnamePerPair->map(function ($opname, $key) use ($computedStocksByKey) {
             $stock = $computedStocksByKey->get($key);
+            $stockQty = $stock?->stock_qty ?? 0;
 
             return (object) [
                 'material_name' => $opname->material?->material_name ?? $opname->material_name_manual ?? '—',
                 'location' => $opname->location ?? '-',
-                'stock_qty' => $stock?->stock_qty ?? 0,
+                'stock_qty' => $stockQty,
+                'actual_qty' => $opname->actual_quantity,
                 'last_status' => $opname->status,
                 'last_diff' => $opname->difference,
                 'last_opname_at' => $opname->opname_date,
             ];
+        })->filter(function ($item) {
+            return in_array($item->last_status, ['surplus', 'missing']) || ($item->stock_qty != $item->actual_qty);
         })->values();
 
         return view('stock_opnames.index', compact('stockOpnames', 'notOpnamed', 'recommendedOpname'));

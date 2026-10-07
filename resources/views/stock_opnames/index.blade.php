@@ -77,7 +77,7 @@
                     <div class="flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-orange-400 animate-pulse"></span>
                         <h3 class="font-bold text-gray-800">Rekomendasi Di-Opname Ulang</h3>
-                        <span class="text-xs text-gray-400">(opname terakhir surplus / missing)</span>
+                        <span class="text-xs text-gray-400 flex-1 hidden md:inline">(opname terakhir surplus / missing atau stok berubah sejak opname)</span>
                     </div>
                     <span class="bg-orange-100 text-orange-700 text-xs font-bold px-2.5 py-1 rounded-full">
                         {{ $recommendedOpname->count() }} item
@@ -108,12 +108,22 @@
                                     </td>
                                     <td class="px-5 py-3 text-center">
                                         @if($row->last_status === 'surplus')
-                                            <span class="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                                            <span class="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full mb-1 inline-block">
                                                 ↑ Surplus (+{{ $row->last_diff }})
                                             </span>
-                                        @else
-                                            <span class="px-2.5 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
+                                        @elseif($row->last_status === 'missing')
+                                            <span class="px-2.5 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full mb-1 inline-block">
                                                 ↓ Missing ({{ $row->last_diff }})
+                                            </span>
+                                        @else
+                                            <span class="px-2.5 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full mb-1 inline-block">
+                                                ✓ Matched
+                                            </span>
+                                        @endif
+
+                                        @if($row->stock_qty != $row->actual_qty)
+                                            <span class="px-2.5 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded-full inline-block mt-1">
+                                                Jangan lupa opname lagi
                                             </span>
                                         @endif
                                     </td>
