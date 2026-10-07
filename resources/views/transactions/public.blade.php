@@ -179,7 +179,7 @@
                             Nama Barang &amp; Lokasi
                         </label>
                         <select id="take_stock_select" class="take-select w-full">
-                            <option value="">Item Barang : </option>
+                            <option value="">Item : </option>
                             @foreach($stocks as $i => $s)
                                 <option value="{{ $i }}"
                                         data-material-id="{{ $s->material_id }}"
@@ -309,7 +309,7 @@
         (function () {
             const ts = new TomSelect('#take_stock_select', {
                 allowEmptyOption: true,
-                placeholder: 'Cari nama barang & lokasi...',
+                placeholder: 'Item : ',
                 maxOptions: 300,
             });
             ts.on('change', function (val) { fillTakeFields(val === '' ? null : parseInt(val, 10)); });
