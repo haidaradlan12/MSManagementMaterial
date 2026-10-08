@@ -6,38 +6,45 @@
     </x-slot>
 
     {{-- Modal Lihat Gambar --}}
-    <div id="photo-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-4">
+    <div id="photo-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display:none">
+        <div class="bg-gray-100 border border-gray-200 rounded-2xl shadow-2xl max-w-lg w-full p-4">
             <div class="flex items-center justify-between mb-3">
-                <h3 class="font-bold text-gray-800 text-sm">Foto Bukti Transaksi</h3>
-                <button onclick="closePhotoModal()" class="text-gray-400 hover:text-gray-700 transition-colors">
+                <h3 class="font-bold text-gray-700 text-sm">Foto Bukti Transaksi</h3>
+                <button onclick="closePhotoModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
-            <img id="photo-modal-img" src="" alt="Foto Bukti" class="w-full rounded-xl object-contain max-h-[70vh]">
+            <img id="photo-modal-img" src="" alt="Foto Bukti" class="w-full rounded-xl object-contain max-h-[60vh] bg-gray-200">
         </div>
     </div>
 
     {{-- Modal Setujui dengan Divisi --}}
-    <div id="approve-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="font-bold text-gray-800">Setujui Transaksi</h3>
-                <button onclick="closeApproveModal()" class="text-gray-400 hover:text-gray-700 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div id="approve-modal" class="fixed inset-0 z-50 items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display:none">
+        <div class="bg-green-50 border border-green-200 rounded-2xl shadow-2xl max-w-sm w-full p-5">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-green-800 text-sm">Setujui Transaksi</h3>
+                </div>
+                <button onclick="closeApproveModal()" class="text-green-400 hover:text-green-700 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
-            <p class="text-sm text-gray-500 mb-4">Pilih divisi yang bertanggung jawab sebelum menyetujui pengajuan ini.</p>
+            <p class="text-xs text-green-700 mb-3">Pilih divisi yang bertanggung jawab.</p>
             <form id="approve-form" method="POST" action="">
                 @csrf
-                <div class="mb-5">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Divisi <span class="text-red-500">*</span></label>
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold text-green-800 mb-1">Divisi <span class="text-red-500">*</span></label>
                     <select name="division" id="approve-division-select" required
-                            class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-green-400 focus:border-green-400 outline-none">
+                            class="w-full border border-green-300 bg-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-400 focus:border-green-400 outline-none">
                         <option value="">— Pilih Divisi —</option>
                         @foreach($divisions as $div)
                             <option value="{{ $div }}">{{ $div }}</option>
@@ -45,13 +52,13 @@
                     </select>
                     <p id="division-error" class="hidden text-red-500 text-xs mt-1">Divisi wajib dipilih.</p>
                 </div>
-                <div class="flex gap-3">
+                <div class="flex gap-2">
                     <button type="button" onclick="closeApproveModal()"
-                            class="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors">
+                            class="flex-1 px-3 py-2 border border-green-300 text-green-700 text-xs font-medium rounded-lg hover:bg-green-100 transition-colors">
                         Batal
                     </button>
                     <button type="submit"
-                            class="flex-1 px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl transition-colors">
+                            class="flex-1 px-3 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded-lg transition-colors">
                         ✓ Setujui
                     </button>
                 </div>
@@ -326,12 +333,13 @@
     <script>
         /* ── Modal Foto ─────────────────────────────────────────── */
         function openPhotoModal(url) {
+            var modal = document.getElementById('photo-modal');
             document.getElementById('photo-modal-img').src = url;
-            document.getElementById('photo-modal').classList.remove('hidden');
+            modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
         function closePhotoModal() {
-            document.getElementById('photo-modal').classList.add('hidden');
+            document.getElementById('photo-modal').style.display = 'none';
             document.getElementById('photo-modal-img').src = '';
             document.body.style.overflow = '';
         }
@@ -344,11 +352,11 @@
             document.getElementById('approve-form').action = actionUrl;
             document.getElementById('approve-division-select').value = '';
             document.getElementById('division-error').classList.add('hidden');
-            document.getElementById('approve-modal').classList.remove('hidden');
+            document.getElementById('approve-modal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
         function closeApproveModal() {
-            document.getElementById('approve-modal').classList.add('hidden');
+            document.getElementById('approve-modal').style.display = 'none';
             document.body.style.overflow = '';
         }
         document.getElementById('approve-modal').addEventListener('click', function (e) {
