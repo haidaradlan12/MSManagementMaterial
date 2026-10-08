@@ -89,12 +89,17 @@ class InventoryTransactionController extends Controller
             $query->where('division', $request->division);
         }
 
+        $dateType = $request->input('date_type', 'created_at');
+        if (!in_array($dateType, ['created_at', 'updated_at'])) {
+            $dateType = 'created_at';
+        }
+
         if ($request->filled('date_from')) {
-            $query->whereDate('created_at', '>=', $request->date_from);
+            $query->whereDate($dateType, '>=', $request->date_from);
         }
 
         if ($request->filled('date_to')) {
-            $query->whereDate('created_at', '<=', $request->date_to);
+            $query->whereDate($dateType, '<=', $request->date_to);
         }
 
         $history = $query->latest()->paginate(15)->withQueryString();

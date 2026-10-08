@@ -126,7 +126,7 @@
                                     <td class="px-5 py-3">
                                         @if($tx->photo_path)
                                             <button type="button"
-                                                    onclick="openPhotoModal('{{ Storage::disk('public')->url($tx->photo_path) }}')"
+                                                    onclick="openPhotoModal('{{ asset('storage_public/' . $tx->photo_path) }}')"
                                                     class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-semibold rounded-lg transition-colors">
                                                 🖼 Lihat
                                             </button>
@@ -205,6 +205,11 @@
                                 <option value="{{ $div }}" {{ request('division') === $div ? 'selected' : '' }}>{{ $div }}</option>
                             @endforeach
                         </select>
+                        {{-- Pilihan Jenis Tanggal --}}
+                        <select name="date_type" class="text-sm border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1.5" title="Jenis Tanggal">
+                            <option value="created_at" {{ request('date_type', 'created_at') === 'created_at' ? 'selected' : '' }}>Tgl Pengajuan</option>
+                            <option value="updated_at" {{ request('date_type') === 'updated_at' ? 'selected' : '' }}>Tgl Validasi</option>
+                        </select>
 
                         {{-- Filter Tanggal Dari --}}
                         <input type="date" name="date_from" value="{{ request('date_from') }}"
@@ -274,7 +279,7 @@
                                     <td class="px-5 py-3">
                                         @if($tx->photo_path)
                                             <button type="button"
-                                                    onclick="openPhotoModal('{{ Storage::disk('public')->url($tx->photo_path) }}')"
+                                                    onclick="openPhotoModal('{{ asset('storage_public/' . $tx->photo_path) }}')"
                                                     class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-semibold rounded-lg transition-colors">
                                                 🖼 Lihat
                                             </button>
