@@ -128,7 +128,7 @@
                                     <td class="px-5 py-3">
                                         @if($tx->photo_path)
                                             <button type="button"
-                                                    onclick="openPhotoModal('{{ asset('storage_public/' . $tx->photo_path) }}')"
+                                                    onclick="openPhotoModal('{{ asset('storage/' . $tx->photo_path) }}')"
                                                     class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-semibold rounded-lg transition-colors">
                                                 🖼 Lihat
                                             </button>
@@ -281,7 +281,7 @@
                                     <td class="px-5 py-3">
                                         @if($tx->photo_path)
                                             <button type="button"
-                                                    onclick="openPhotoModal('{{ asset('storage_public/' . $tx->photo_path) }}')"
+                                                    onclick="openPhotoModal('{{ asset('storage/' . $tx->photo_path) }}')"
                                                     class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-semibold rounded-lg transition-colors">
                                                 🖼 Lihat
                                             </button>
