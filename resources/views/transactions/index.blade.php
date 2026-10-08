@@ -7,7 +7,7 @@
 
     {{-- Modal Lihat Gambar --}}
     <div id="photo-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display:none">
-        <div class="bg-gray-100 border border-gray-200 rounded-2xl shadow-2xl max-w-lg w-full p-4">
+        <div class="bg-gray-100 border border-gray-200 rounded-2xl shadow-2xl w-full p-4 mx-auto" style="max-width: 500px;">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="font-bold text-gray-700 text-sm">Foto Bukti Transaksi</h3>
                 <button onclick="closePhotoModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
@@ -22,7 +22,7 @@
 
     {{-- Modal Setujui dengan Divisi --}}
     <div id="approve-modal" class="fixed inset-0 z-50 items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display:none">
-        <div class="bg-green-50 border border-green-200 rounded-2xl shadow-2xl max-w-sm w-full p-5">
+        <div class="bg-green-50 border border-green-200 rounded-2xl shadow-2xl w-full p-5 mx-auto" style="max-width: 380px;">
             <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-2">
                     <div class="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center">
