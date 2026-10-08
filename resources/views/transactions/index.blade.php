@@ -15,6 +15,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
+            </div>
             <div class="mt-2 text-center">
                 <img id="photo-modal-img" src="" alt="Foto Bukti" class="w-full rounded-xl object-contain bg-gray-200 mx-auto" style="max-height: 65vh; width: auto;">
             </div>
