@@ -8,9 +8,13 @@ use App\Models\InventoryTransaction;
 use App\Models\Material;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class InventoryTransactionController extends Controller
 {
+    /** Division options available to admin. */
+    public const DIVISIONS = ['MEP Electric', 'MEP AC', 'Instrument', 'Carpenter'];
+
     /** Public landing page – no auth required. */
     public function publicIndex()
     {
@@ -39,7 +43,18 @@ class InventoryTransactionController extends Controller
                 ->withErrors(['material_id' => 'Pilih barang yang tersedia dari daftar.']);
         }
 
-        InventoryTransaction::create(array_merge($data, ['status' => 'pending']));
+        // Handle photo upload
+        $photoPath = null;
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store('transactions', 'public');
+        }
+
+        unset($data['photo']);
+
+        InventoryTransaction::create(array_merge($data, [
+            'status' => 'pending',
+            'photo_path' => $photoPath,
+        ]));
 
         return redirect()
             ->route('transactions.public')
@@ -70,16 +85,46 @@ class InventoryTransactionController extends Controller
             });
         }
 
+        if ($request->filled('division')) {
+            $query->where('division', $request->division);
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
         $history = $query->latest()->paginate(15)->withQueryString();
 
-        return view('transactions.index', compact('pending', 'history'));
+        $divisions = self::DIVISIONS;
+
+        return view('transactions.index', compact('pending', 'history', 'divisions'));
+    }
+
+    /** Admin: show approve form with division selector. */
+    public function showApproveForm(InventoryTransaction $inventoryTransaction)
+    {
+        $divisions = self::DIVISIONS;
+
+        return view('transactions.approve', compact('inventoryTransaction', 'divisions'));
     }
 
     /** Admin: approve a transaction. */
-    public function approve(InventoryTransaction $inventoryTransaction)
+    public function approve(Request $request, InventoryTransaction $inventoryTransaction)
     {
+        $request->validate([
+            'division' => 'required|in:'.implode(',', self::DIVISIONS),
+        ], [
+            'division.required' => 'Divisi wajib dipilih sebelum menyetujui.',
+            'division.in' => 'Divisi tidak valid.',
+        ]);
+
         $inventoryTransaction->update([
             'status' => 'approved',
+            'division' => $request->division,
             'validated_at' => Carbon::now(),
         ]);
 
@@ -100,6 +145,11 @@ class InventoryTransactionController extends Controller
     /** Admin: delete a transaction. */
     public function destroy(InventoryTransaction $inventoryTransaction)
     {
+        // Delete photo file if it exists
+        if ($inventoryTransaction->photo_path) {
+            Storage::disk('public')->delete($inventoryTransaction->photo_path);
+        }
+
         $inventoryTransaction->delete();
 
         return redirect()->route('transactions.index')->with('success', 'Transaksi dihapus.');

@@ -96,7 +96,7 @@
                 <h2 class="text-lg font-bold text-gray-800 mb-1">Form Penerimaan Barang</h2>
                 <p class="text-sm text-gray-500 mb-6">Isi data di bawah ini. Pengajuan akan divalidasi oleh admin.</p>
 
-                <form action="{{ route('transactions.public.store') }}" method="POST" novalidate>
+                <form action="{{ route('transactions.public.store') }}" method="POST" enctype="multipart/form-data" novalidate>
                     @csrf
                     <input type="hidden" name="type" value="receive">
 
@@ -138,11 +138,22 @@
                         </div>
                     </div>
 
-                    <div class="mb-6">
+                    <div class="mb-4">
                         <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Penerima</label>
                         <input type="text" name="person_name" required value="{{ old('person_name') }}" placeholder="Nama lengkap penerima..."
                                class="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
                         @error('person_name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    {{-- Foto Bukti --}}
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Foto Bukti <span class="text-gray-400 font-normal text-xs">(opsional, maks. 5MB)</span></label>
+                        <div class="relative">
+                            <input type="file" name="photo" id="receive_photo" accept="image/*"
+                                   class="block w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-gray-200 rounded-xl cursor-pointer">
+                        </div>
+                        <p id="receive_photo_preview" class="hidden mt-2 text-xs text-gray-500"></p>
+                        @error('photo') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <button type="submit"
@@ -165,7 +176,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('transactions.public.store') }}" method="POST" id="take-form" novalidate>
+                <form action="{{ route('transactions.public.store') }}" method="POST" id="take-form" enctype="multipart/form-data" novalidate>
                     @csrf
                     <input type="hidden" name="type" value="take">
                     <!-- Populated by JS -->
@@ -231,11 +242,22 @@
                     </div>
 
                     <!-- Nama Pengambil -->
-                    <div class="mb-6">
+                    <div class="mb-4">
                         <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Pengambil</label>
                         <input type="text" name="person_name" required placeholder="Nama lengkap pengambil..."
                                class="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-orange-400 outline-none">
                         @error('person_name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    {{-- Foto Bukti --}}
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Foto Bukti <span class="text-gray-400 font-normal text-xs">(opsional, maks. 5MB)</span></label>
+                        <div class="relative">
+                            <input type="file" name="photo" id="take_photo" accept="image/*"
+                                   class="block w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100 border border-gray-200 rounded-xl cursor-pointer">
+                        </div>
+                        <p id="take_photo_preview" class="hidden mt-2 text-xs text-gray-500"></p>
+                        @error('photo') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <button type="submit" id="take_submit_btn"
@@ -329,6 +351,30 @@
         @if(old('type') === 'take')
             switchTab('take');
         @endif
+
+        /* ─── Photo filename preview ─────────────────────────────── */
+        function setupPhotoPreview(inputId, previewId) {
+            document.getElementById(inputId).addEventListener('change', function () {
+                const preview = document.getElementById(previewId);
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+                    preview.textContent = '📎 ' + file.name + ' (' + sizeMB + ' MB)';
+                    preview.classList.remove('hidden');
+                    if (file.size > 5 * 1024 * 1024) {
+                        preview.classList.add('text-red-500');
+                        preview.classList.remove('text-gray-500');
+                    } else {
+                        preview.classList.remove('text-red-500');
+                        preview.classList.add('text-gray-500');
+                    }
+                } else {
+                    preview.classList.add('hidden');
+                }
+            });
+        }
+        setupPhotoPreview('receive_photo', 'receive_photo_preview');
+        setupPhotoPreview('take_photo', 'take_photo_preview');
     </script>
 </body>
 </html>

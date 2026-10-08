@@ -68,7 +68,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('transactions', InventoryTransactionController::class)
         ->except(['create', 'store'])
         ->parameters(['transactions' => 'inventoryTransaction']);
-    Route::patch('transactions/{inventoryTransaction}/approve', [InventoryTransactionController::class, 'approve'])->name('transactions.approve');
+    Route::post('transactions/{inventoryTransaction}/approve', [InventoryTransactionController::class, 'approve'])->name('transactions.approve');
     Route::patch('transactions/{inventoryTransaction}/reject', [InventoryTransactionController::class, 'reject'])->name('transactions.reject');
 
     // User management - only for admin

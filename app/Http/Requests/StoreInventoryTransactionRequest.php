@@ -30,6 +30,7 @@ class StoreInventoryTransactionRequest extends FormRequest
             'location' => 'required|string|max:255',
             'person_name' => 'required|string|max:255',
             'purpose' => 'required_if:type,take|nullable|string|max:255',
+            'photo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
         ];
     }
 

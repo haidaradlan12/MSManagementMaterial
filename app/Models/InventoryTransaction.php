@@ -23,6 +23,8 @@ class InventoryTransaction extends Model
         'person_name',
         'purpose',
         'status',
+        'photo_path',
+        'division',
         'validated_at',
     ];
 
